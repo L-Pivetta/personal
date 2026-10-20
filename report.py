@@ -131,11 +131,6 @@ def _sezioni_ricerca(cartella, ruoli, config=None):
                 or url in gruppo["url_visti"]
             ):
                 continue
-            if (
-                not macchina.get("cerca_sul_web", True)
-                and url not in macchina.get("siti_da_indagare", [])
-            ):
-                continue
             gruppo["url_visti"].add(url)
             gruppo["pagine"].append(pagina)
 

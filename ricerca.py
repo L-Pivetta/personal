@@ -4,13 +4,13 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-import google_api
+import ollama
 import requests
 import trafilatura
 from ddgs import DDGS
 
 
-TIMEOUT_RIASSUNTO_SECONDI = 240
+TIMEOUT_RIASSUNTO_SECONDI = 300
 CARATTERI_MASSIMI_PER_FONTE = 7500
 PAGINE_OBIETTIVO = 3
 ESTENSIONI_ESCLUSE = {".pdf", ".mp4", ".m4v", ".mov", ".avi", ".mkv", ".webm"}
@@ -135,7 +135,7 @@ def _sintetizza_fonti(agente, risultati, avviso):
         return ""
 
     try:
-        client = google_api.Client(timeout=TIMEOUT_RIASSUNTO_SECONDI)
+        client = ollama.Client(timeout=TIMEOUT_RIASSUNTO_SECONDI)
         riassunti = []
         for pagina in risultati:
             risposta = client.chat(
@@ -200,12 +200,6 @@ def _sintetizza_fonti(agente, risultati, avviso):
             options={"num_ctx": 4096, "num_predict": 500},
         )
     except Exception as errore:
-        if google_api.is_quota_error(errore):
-            raise RuntimeError(
-                f"Quota Gemini esaurita durante la sintesi delle fonti per "
-                f"{agente['id']} con il modello {agente['nome_modello']}. "
-                "Controlla le quote e la fatturazione del progetto Google AI Studio."
-            ) from errore
         print(f"Sintesi delle fonti per {agente['id']} non riuscita: {errore}")
         return ""
 

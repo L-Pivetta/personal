@@ -1,19 +1,18 @@
-# Dialogo tra modelli Gemini
+# Dialogo tra modelli Ollama
 
-Il progetto fa dialogare due modelli Gemini tramite Google AI Studio, consulta il
-web per preparare le schede dei ruoli, valuta il confronto e crea un report HTML.
+Il progetto fa dialogare due modelli locali, consulta il web per preparare le
+schede dei ruoli, valuta il confronto con un modello Ollama e crea un report HTML.
 
 ## Avvio su Windows
 
-1. Crea una chiave API gratuita in [Google AI Studio](https://aistudio.google.com/apikey).
-2. Imposta la chiave nella sessione PowerShell senza inserirla nei file:
-   `$env:GEMINI_API_KEY = "la-tua-chiave"`
-3. Crea l'ambiente virtuale:
+1. Verifica che l'applicazione Ollama sia avviata. Per vedere i modelli installati:
+   `ollama list`
+2. Apri PowerShell in questa cartella e crea l'ambiente virtuale:
    `python -m venv .venv`
-4. Installa le librerie del progetto:
+3. Installa le librerie del progetto:
    `.venv\Scripts\python -m pip install -r requirements.txt`
-5. Modifica solo `config.json`. I nomi dei modelli devono essere disponibili
-   nell'API Gemini; il valore iniziale è `gemini-3.8-flash`. Nel campo `riassunto` puoi inserire indicazioni
+4. Modifica solo `config.json`. I nomi dei modelli devono corrispondere a quelli
+   mostrati da `ollama list`. Nel campo `riassunto` puoi inserire indicazioni
    sull'identità e sulla posizione che la macchina deve sostenere. La scheda
    `scheda_<macchina>.json` mantiene distinti `vincoli`, `riassunto` e `sintesi`
    delle pagine web; tutti e tre vengono forniti al modello durante il dialogo.
@@ -32,21 +31,8 @@ web per preparare le schede dei ruoli, valuta il confronto e crea un report HTML
    rispetto ai limiti numerici dei vincoli e all'ultima proposta avversaria,
    per evitare che un'offerta peggiori la posizione negoziale della macchina.
    Se `vincoli` è omesso o vuoto, non sono configurati vincoli inderogabili.
-6. Avvia il progetto:
+5. Avvia il progetto:
    `.venv\Scripts\python main.py`
-
-La verifica iniziale controlla che i nomi dei modelli esistano, ma non può
-garantire che il progetto abbia quota per generare contenuti. Se Google
-restituisce `429 RESOURCE_EXHAUSTED` (in particolare con quota free-tier
-`limit: 0`), controlla le quote del progetto associato alla chiave e la
-fatturazione in Google AI Studio; in alternativa, scegli in `config.json`
-modelli per cui il progetto ha quota disponibile. Durante la generazione degli
-interventi, il programma rispetta l'eventuale `RetryInfo` del `429` e riprova
-una volta dopo l'attesa indicata da Google. Per un `503 UNAVAILABLE` riprova
-fino a tre volte, attendendo progressivamente 2, 4 e 8 secondi; per gli altri
-errori mantiene un solo retry. Se non riesce, salva `[creazione turno fallita]`
-e prosegue con il turno successivo. Gli altri errori di sintesi mantengono il
-comportamento di recupero già previsto.
 
 Per rifare valutazione e report usando un dialogo già salvato, senza avviare
 ricerca o generazione, esegui:
@@ -66,8 +52,7 @@ automatica, se attiva, aggiunge fonti fino a raggiungere tre pagine quando i
 siti manuali riusciti sono meno di tre. Tutti i siti manuali vengono comunque
 mantenuti. Gli URL duplicati vengono ignorati e ogni pagina in
 `ricerca_<macchina>.json` riporta la provenienza. Con `cerca_sul_web: false`
-vengono usati solo i siti indicati manualmente e il report non mostra risultati
-automatici archiviati da esecuzioni precedenti. Se un sito non è scaricabile o
+vengono usati solo i siti indicati manualmente. Se un sito non è scaricabile o
 non contiene testo estraibile, il programma stampa un avviso.
 
 `numero_di_turni` indica il numero di scambi: in ciascuno parlano entrambe le

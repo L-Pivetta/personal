@@ -1,8 +1,6 @@
 import re
-import time
-from math import ceil
 
-import google_api
+import ollama
 from wordfreq import tokenize, zipf_frequency
 
 from negoziazione import errore_offerta
@@ -161,7 +159,7 @@ def _rigenera_se_include_altra_macchina(testo, richiesta, agente, schede, macchi
             f"\nRisposta non valida di {agente['id']}: "
             "attribuisce battute all'altra macchina; provo a rigenerarla."
         )
-        risposta = google_api.chat(
+        risposta = ollama.chat(
             model=agente["nome_modello"],
             messages=[
                 {
@@ -198,7 +196,7 @@ def _completa_intervento(testo, agente, schede):
         return testo
 
     print(f"\nRisposta incompleta di {agente['id']}: provo a completarla.")
-    recupero = google_api.chat(
+    recupero = ollama.chat(
         model=agente["nome_modello"],
         messages=[
             {
@@ -257,7 +255,7 @@ def _verifica_e_rigenera_dialogo(
         )
         tentativi[indice] = tentativi.get(indice, 0) + 1
         try:
-            risposta = google_api.chat(
+            risposta = ollama.chat(
                 model=agente["nome_modello"],
                 messages=[
                     {
@@ -295,9 +293,9 @@ def _verifica_e_rigenera_dialogo(
 
 
 def _genera_intervento(richiesta, agente, schede, macchine, interventi):
-    for tentativo in range(4):
+    for tentativo in range(2):
         try:
-            risposta = google_api.chat(
+            risposta = ollama.chat(
                 model=agente["nome_modello"],
                 messages=[
                     {
@@ -327,7 +325,7 @@ def _genera_intervento(richiesta, agente, schede, macchine, interventi):
                     f"\nOfferta non coerente di {agente['id']}: "
                     f"{errore} Provo a rigenerarla."
                 )
-                risposta = google_api.chat(
+                risposta = ollama.chat(
                     model=agente["nome_modello"],
                     messages=[
                         {
@@ -370,42 +368,8 @@ def _genera_intervento(richiesta, agente, schede, macchine, interventi):
         except Exception as errore:
             print(
                 f"Creazione dell'intervento di {agente['id']} non riuscita "
-                f"(tentativo {tentativo + 1}): {errore}"
+                f"(tentativo {tentativo + 1}/2): {errore}"
             )
-            if google_api.is_quota_error(errore):
-                print(
-                    f"Quota Gemini esaurita per {agente['id']} "
-                    f"(modello {agente['nome_modello']}): {errore}. "
-                    + (
-                        "Riprovo una sola volta."
-                        if tentativo == 0
-                        else "Nessun altro retry; segno il turno come fallito."
-                    )
-                )
-                if tentativo == 0:
-                    attesa = google_api.retry_delay_seconds(errore)
-                    if attesa is not None:
-                        attesa = ceil(attesa) + 1
-                        print(
-                            f"Attendo {attesa} secondi prima di riprovare, "
-                            "come richiesto dalla quota Gemini."
-                        )
-                        time.sleep(attesa)
-                    continue
-                break
-            if google_api.is_service_unavailable_error(errore):
-                if tentativo < 3:
-                    attesa = 2 ** (tentativo + 1)
-                    print(
-                        f"Modello Gemini temporaneamente non disponibile; "
-                        f"nuovo tentativo tra {attesa} secondi."
-                    )
-                    time.sleep(attesa)
-                    continue
-                break
-            if tentativo == 0:
-                continue
-            break
 
     print(f"Intervento di {agente['id']} non prodotto: proseguo il dialogo.")
     return "[creazione turno fallita]"

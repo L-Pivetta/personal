@@ -1,6 +1,6 @@
 import json
 
-import google_api
+import ollama
 
 from negoziazione import errore_vincolo_prezzo
 
@@ -146,8 +146,6 @@ def valuta_dialogo(config, interventi):
                     "non un vincolo, salvo che sia ripetuto tra i vincoli inderogabili. "
                     "Se i vincoli non sono rispettati, l'obiettivo non può essere considerato raggiunto. "
                     "Motiva ogni esito con una breve evidenza tratta dal dialogo. "
-                    "Mantieni ogni motivazione entro una frase breve e il commento conciso "
-                    "per restituire tutti i campi in un JSON completo. "
                     "Per cooperazione usa la scala operativa indicata alle macchine e "
                     "valuta il comportamento effettivamente mostrato da entrambe nel dialogo: "
                     "disponibilità a rivedere la propria posizione e impegno a cercare "
@@ -198,11 +196,11 @@ def valuta_dialogo(config, interventi):
     errori_finali = []
     for numero_tentativo in range(2):
         try:
-            risposta = google_api.chat(
+            risposta = ollama.chat(
                 model=config["valutatore"]["nome_modello"],
                 format="json",
                 messages=messaggi,
-                options={"num_predict": 2048},
+                options={"num_predict": 900},
             )
             risposta_grezza = risposta.message.content
             try:
@@ -214,12 +212,6 @@ def valuta_dialogo(config, interventi):
                 dati = {}
                 errori_finali = ["La risposta non contiene JSON valido."]
         except Exception as errore:
-            if google_api.is_quota_error(errore):
-                raise RuntimeError(
-                    "Quota Gemini esaurita durante la valutazione con il "
-                    f"modello {config['valutatore']['nome_modello']}. "
-                    "Controlla le quote e la fatturazione del progetto Google AI Studio."
-                ) from errore
             risposta_grezza = None
             dati = {}
             errori_finali = [f"Chiamata al valutatore non riuscita: {errore}"]
