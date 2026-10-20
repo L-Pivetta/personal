@@ -1,0 +1,32 @@
+{
+  "numero_di_turni": inserire un intero,
+  "valutatore": {
+    "nome_modello": "gemini-3.8-flash"
+  },
+  "macchine": [
+    {
+      "id": "Macchina 1",
+      "ruolo_assegnato": "Macchina 1",
+      "obiettivo": "inserire un obiettivo",
+      "vincoli": ["inserire vincoli"],
+      "grado_di_cooperazione": inserire un intero da 1 a 10,
+      "tema_iniziale": "inserire un titolo rappresentativo",
+      "nome_modello": "gemini-3.5-flash-lite",
+      "siti_da_indagare": [],
+      "cerca_sul_web": false,
+      "riassunto": "inserire una breve descrizione dell'identità di Macchina 1 e al tipo di interazione desiderata con Macchina 2"
+    },
+    {
+      "id": "Macchina 2",
+      "ruolo_assegnato": "Macchina 2",
+      "obiettivo": "inserire un obiettivo",
+      "vincoli": ["inserire vincoli"],
+      "grado_di_cooperazione": inserire un intero da 1 a 10,
+      "tema_iniziale": "inserire un titolo rappresentativo",
+      "nome_modello": "gemini-3.5-flash-lite",
+      "siti_da_indagare": [],
+      "cerca_sul_web": false,
+      "riassunto": "inserire una breve descrizione dell'identità di Macchina 2 e al tipo di interazione desiderata con Macchina 1"
+    }
+  ]
+}
