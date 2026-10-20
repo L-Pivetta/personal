@@ -1,32 +1,32 @@
 {
-  "numero_di_turni": inserire un intero,
+  "numero_di_turni": 3,
   "valutatore": {
-    "nome_modello": "gemini-3.8-flash"
+    "nome_modello": "mistral:latest"
   },
   "macchine": [
     {
-      "id": "Macchina 1",
-      "ruolo_assegnato": "Macchina 1",
-      "obiettivo": "inserire un obiettivo",
-      "vincoli": ["inserire vincoli"],
-      "grado_di_cooperazione": inserire un intero da 1 a 10,
-      "tema_iniziale": "inserire un titolo rappresentativo",
-      "nome_modello": "gemini-3.5-flash-lite",
+      "id": "Lupo",
+      "ruolo_assegnato": "Lupo",
+      "obiettivo": "Devi convincere la [Pecora] ad aprirti la porta di casa sua in modo che tu possa entrare e mangiarla.",
+      "vincoli": ["Non devi permettere che la [Pecora] scopra la tua intenzione di mangiarla."],
+      "grado_di_cooperazione": 5,
+      "tema_iniziale": "Si può aprire la porta?",
+      "nome_modello": "llama3.2:latest",
       "siti_da_indagare": [],
       "cerca_sul_web": false,
-      "riassunto": "inserire una breve descrizione dell'identità di Macchina 1 e al tipo di interazione desiderata con Macchina 2"
+      "riassunto": "Sei un lupo affamato e sai che nella casa che hai di fronte vive una pecora che vorresti mangiare. Bussa alla porta e cerca di convincerla ad aprirti in modo che tu possa entrare in casa e mangiarla."
     },
     {
-      "id": "Macchina 2",
-      "ruolo_assegnato": "Macchina 2",
-      "obiettivo": "inserire un obiettivo",
-      "vincoli": ["inserire vincoli"],
-      "grado_di_cooperazione": inserire un intero da 1 a 10,
-      "tema_iniziale": "inserire un titolo rappresentativo",
-      "nome_modello": "gemini-3.5-flash-lite",
+      "id": "Pecora",
+      "ruolo_assegnato": "Pecora",
+      "obiettivo": "Devi cercare di capire chi sta bussando alla tua porta e decidere se aprire o meno.",
+      "vincoli": ["Apri la porta solo se riconosci chi sta bussando e ti convince che non ti vuole fare del male."],
+      "grado_di_cooperazione": 5,
+      "tema_iniziale": "Si può aprire la porta?",
+      "nome_modello": "llama3.1:8b",
       "siti_da_indagare": [],
       "cerca_sul_web": false,
-      "riassunto": "inserire una breve descrizione dell'identità di Macchina 2 e al tipo di interazione desiderata con Macchina 1"
+      "riassunto": "Sei una pecora che vive da sola in una casa nel bosco. Senti bussare alla porta e l'individuo che c'è dall'altra parte ti chiede di lasciarlo entrare. Devi decidere se aprire o meno."
     }
   ]
 }

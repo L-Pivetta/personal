@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
-import google_api
+import ollama
 
 from crea_archivio_report import archivia_report, archivia_schede_ricerche
 from dialogo import avvia_dialogo
@@ -17,7 +17,7 @@ from valutazione import valuta_dialogo
 CARTELLA_PROGETTO = Path(__file__).resolve().parent
 
 
-def verifica_google(config, includi_modelli_dialogo=True):
+def verifica_ollama(config, includi_modelli_dialogo=True):
     modelli_richiesti = (
         {agente["nome_modello"] for agente in config["macchine"]}
         if includi_modelli_dialogo
@@ -26,13 +26,28 @@ def verifica_google(config, includi_modelli_dialogo=True):
     modelli_richiesti.add(config["valutatore"]["nome_modello"])
 
     try:
-        google_api.verifica_modelli(modelli_richiesti)
+        risposta = ollama.list()
     except Exception as errore:
         raise RuntimeError(
-            "Verifica Google AI Studio non riuscita. Controlla la chiave "
-            "GEMINI_API_KEY e i nomi dei modelli in config.json. "
+            "Ollama non è raggiungibile. Avvia Ollama e riprova. "
             f"Dettaglio: {errore}"
         ) from errore
+
+    modelli_installati = {
+        modello.get("model") if isinstance(modello, dict) else modello.model
+        for modello in (
+            risposta.get("models", [])
+            if isinstance(risposta, dict)
+            else risposta.models
+        )
+    }
+    modelli_mancanti = sorted(modelli_richiesti - modelli_installati)
+    if modelli_mancanti:
+        elenco = ", ".join(modelli_mancanti)
+        raise RuntimeError(
+            f"Modelli Ollama non installati: {elenco}. "
+            f"Installali con: ollama pull {modelli_mancanti[0]}"
+        )
 
 
 def carica_configurazione():
@@ -143,7 +158,7 @@ def valuta_e_crea_report(config, interventi, cartella_output, percorso_log=None)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Dialogo tra modelli Gemini")
+    parser = argparse.ArgumentParser(description="Dialogo tra modelli Ollama")
     parser.add_argument(
         "--da-log",
         metavar="PERCORSO",
@@ -158,12 +173,12 @@ def main():
         if not percorso_log.is_absolute():
             percorso_log = CARTELLA_PROGETTO / percorso_log
         config, interventi = carica_log(percorso_log)
-        verifica_google(config, includi_modelli_dialogo=False)
+        verifica_ollama(config, includi_modelli_dialogo=False)
         valuta_e_crea_report(config, interventi, cartella_output, percorso_log)
         return
 
     config = carica_configurazione()
-    verifica_google(config)
+    verifica_ollama(config)
     cartella_log = CARTELLA_PROGETTO / "logs"
     cartella_output = CARTELLA_PROGETTO / "output"
     cartella_documenti = cartella_output / "archivio_documenti"

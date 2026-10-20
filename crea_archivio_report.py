@@ -104,13 +104,13 @@ def archivia_report(percorso_report, aggiorna=True, config=None):
             macchine = (config or {}).get("macchine", [])
             if len(macchine) == 2:
                 id_macchine = "_".join(str(macchina["id"]) for macchina in macchine)
-                nome_base = f"Report del dialogo Gemini_{id_macchine}"
+                nome_base = f"Report del dialogo Ollama_{id_macchine}"
                 _copia_progressiva(percorso_report, CARTELLA_REPORT, nome_base)
             else:
                 _copia_datata(
                     percorso_report,
                     CARTELLA_REPORT,
-                    "Report del dialogo Gemini",
+                    "Report del dialogo Ollama",
                 )
     if aggiorna:
         crea_archivio()
@@ -170,19 +170,8 @@ def crea_archivio():
             "Ricerca",
         ),
     ):
-        documenti = [
-            (documento, *_titolo_documento(documento, tipo, prefisso))
-            for documento in sorted(cartella.glob(f"{tipo}_*.json"))
-        ]
-        conteggi_titoli = {}
-        for _, titolo, _ in documenti:
-            conteggi_titoli[titolo] = conteggi_titoli.get(titolo, 0) + 1
-
-        progressivi_titoli = {}
-        for documento, titolo, etichetta in documenti:
-            if conteggi_titoli[titolo] > 1:
-                progressivi_titoli[titolo] = progressivi_titoli.get(titolo, 0) + 1
-                titolo = f"{titolo}_{progressivi_titoli[titolo]}"
+        for documento in sorted(cartella.glob(f"{tipo}_*.json")):
+            titolo, etichetta = _titolo_documento(documento, tipo, prefisso)
             if tipo == "scheda":
                 menu.append(crea_menu_scheda(documento, titolo, etichetta))
             else:
